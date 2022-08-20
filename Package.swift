@@ -16,9 +16,6 @@ let package = Package(
         .package(name: "Thrift",
                  url: "/Users/newworld/dev/swift/Thrift2",
                  .branch("master")),
-        .package(name: "PlayingCard",
-                 url: "https://github.com/apple/example-package-playingcard.git",
-                 .branch("main")),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -27,7 +24,6 @@ let package = Package(
             name: "ChainTester",
             dependencies: [
                 .byName(name: "Thrift"),
-                .byName(name: "PlayingCard"),
             ]),
         .testTarget(
             name: "ChainTesterTests",
