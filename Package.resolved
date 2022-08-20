@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "example-package-playingcard",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/example-package-playingcard.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "921e873945247da532fd8238434594179128853b"
+      }
+    },
+    {
+      "identity" : "thrift2",
+      "kind" : "localSourceControl",
+      "location" : "/Users/newworld/dev/swift/Thrift2",
+      "state" : {
+        "branch" : "master",
+        "revision" : "c1fb4bc372b3e39253302e8d2afe328a3833d7d0"
+      }
+    }
+  ],
+  "version" : 2
+}

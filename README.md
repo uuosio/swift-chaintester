@@ -1,3 +1,3 @@
-# ChainTester3
+# ChainTester
 
 A description of this package.
