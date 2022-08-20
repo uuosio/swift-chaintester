@@ -8,6 +8,8 @@ final class ChainTesterTests: XCTestCase {
 
     func testBasic() throws {
         let tester = try ChainTester()
+        try tester.enableDebugContract("helloworld33", true)
+
         let key = try tester.createKey()
         print(key)
 
@@ -28,7 +30,7 @@ final class ChainTesterTests: XCTestCase {
 
         print(try tester.getInfo())
 
-        try tester.deployContract("helloworld33",
+        _ = try tester.deployContract("helloworld33",
             "/Users/newworld/dev/as/ascdk/ts-packages/chaintester/tests/hello.wasm",
             "/Users/newworld/dev/as/ascdk/ts-packages/chaintester/tests/hello.abi"
         )

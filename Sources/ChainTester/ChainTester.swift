@@ -62,6 +62,9 @@ class ApplyRequestService: ApplyRequest {
 
     func apply_request(receiver: Uint64, firstReceiver: Uint64, action: Uint64) throws -> Int32 {
         RunApplyFunc(receiver: receiver.rawValue.uint64, firstReceiver: firstReceiver.rawValue.uint64, action: action.rawValue.uint64)
+        for i in 0...10 {
+            try GetApplyClient().prints(cstr: "hello, world\n")
+        }
         _ = try GetApplyClient().end_apply()
         return 0
     }
@@ -131,6 +134,10 @@ public class ChainTester {
         let key = try client.create_key(key_type: keyType)
         let data = key.data(using: .utf8)!
         return try JSONSerialization.jsonObject(with: data, options : .allowFragments) as! Dictionary<String, String>
+    }
+
+    public func enableDebugContract(_ contract: String, _ enable: Bool) throws {
+        return try client.enable_debug_contract(id: self.id, contract: contract, enable: enable)
     }
 
     public func importKey(_ pubKey: String, _ privKey: String) throws -> Bool {
