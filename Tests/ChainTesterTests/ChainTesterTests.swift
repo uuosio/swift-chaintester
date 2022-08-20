@@ -2,9 +2,6 @@ import XCTest
 @testable import ChainTester
 
 final class ChainTesterTests: XCTestCase {
-    func testGetFile() throws {
-        print(getFile("/Users/newworld/dev/swift/ChainTester3/Sources/ChainTester/interfaces.swift")!)
-    }
 
     func testBasic() throws {
         let tester = try ChainTester()
