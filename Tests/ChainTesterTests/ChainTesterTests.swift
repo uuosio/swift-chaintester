@@ -2,7 +2,11 @@ import XCTest
 @testable import ChainTester
 
 final class ChainTesterTests: XCTestCase {
-    func testExample() throws {
+    func testGetFile() throws {
+        print(getFile("/Users/newworld/dev/swift/ChainTester3/Sources/ChainTester/interfaces.swift")!)
+    }
+
+    func testBasic() throws {
         let tester = try ChainTester()
         let key = try tester.createKey()
         print(key)
@@ -24,7 +28,13 @@ final class ChainTesterTests: XCTestCase {
 
         print(try tester.getInfo())
 
+        try tester.deployContract("helloworld33",
+            "/Users/newworld/dev/as/ascdk/ts-packages/chaintester/tests/hello.wasm",
+            "/Users/newworld/dev/as/ascdk/ts-packages/chaintester/tests/hello.abi"
+        )
+        
         let ret2 = try tester.pushAction("helloworld33", "sayhello", "{}", permissions)
+
 
         print(ret2)
 

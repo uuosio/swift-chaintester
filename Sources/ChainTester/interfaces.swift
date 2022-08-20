@@ -315,6 +315,16 @@ public protocol IPCChainTester {
   ///
   /// - Parameters:
   ///   - id: 
+  ///   - account: 
+  ///   - wasm: 
+  ///   - abi: 
+  /// - Returns: Data
+  /// - Throws: 
+  func deploy_contract(id: Int32, account: String, wasm: String, abi: String) throws -> Data
+
+  ///
+  /// - Parameters:
+  ///   - id: 
   ///   - json: 
   ///   - code: 
   ///   - scope: 

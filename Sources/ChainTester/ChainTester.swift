@@ -62,7 +62,7 @@ class ApplyRequestService: ApplyRequest {
 
     func apply_request(receiver: Uint64, firstReceiver: Uint64, action: Uint64) throws -> Int32 {
         RunApplyFunc(receiver: receiver.rawValue.uint64, firstReceiver: firstReceiver.rawValue.uint64, action: action.rawValue.uint64)
-        try GetApplyClient().end_apply()
+        _ = try GetApplyClient().end_apply()
         return 0
     }
 
@@ -83,16 +83,17 @@ extension Data {
     }
 }
 
-func getFile(forResource resource: String, withExtension fileExt: String?) -> String? {
-    // See if the file exists.
-    guard let fileUrl: URL = Bundle.main.url(forResource: resource, withExtension: fileExt) else {
-        return nil
-    }
-    
+public func getFile(_ path: String, _ hex: Bool = false) -> String? {
+    let fileUrl = URL(fileURLWithPath: path)
+
     do {
         // Get the raw data from the file.
         let rawData: Data = try Data(contentsOf: fileUrl)
-        return rawData.hexEncodedString()
+        if hex {
+            return rawData.hexEncodedString()
+        } else {
+            return String(data: rawData, encoding: String.Encoding.utf8)
+        }
     } catch {
         return nil
     }
@@ -173,6 +174,14 @@ public class ChainTester {
     public func pushAction(_ account: String, _ action: String, _ arguments: String, _ permissions: String) throws -> Dictionary<String, Any> {
         let ret = try self.push_action(id: self.id, account: account, action: action, arguments: arguments, permissions: permissions)
         return try JSONSerialization.jsonObject(with: ret, options : .allowFragments) as! Dictionary<String, Any>
+    }
+
+    public func deployContract(_ account: String, _ wasmFile: String, _ abiFile: String) throws -> Dictionary<String,Any> {
+        let wasm = getFile(wasmFile, true)!
+        let abi = getFile(abiFile)!
+        let ret = try client.deploy_contract(id: self.id, account: account, wasm: wasm, abi: abi)
+        // let data = ret.data(using: .utf8)!
+        return try JSONSerialization.jsonObject(with: ret, options : .allowFragments) as! Dictionary<String,Any>
     }
 }
 

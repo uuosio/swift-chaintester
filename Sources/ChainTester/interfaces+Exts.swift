@@ -2918,6 +2918,149 @@ extension IPCChainTester_push_actions_result : TStruct {
 
 
 
+fileprivate final class IPCChainTester_deploy_contract_args {
+
+  fileprivate var id: Int32
+
+  fileprivate var account: String
+
+  fileprivate var wasm: String
+
+  fileprivate var abi: String
+
+
+  fileprivate init(id: Int32, account: String, wasm: String, abi: String) {
+    self.id = id
+    self.account = account
+    self.wasm = wasm
+    self.abi = abi
+  }
+
+}
+
+fileprivate func ==(lhs: IPCChainTester_deploy_contract_args, rhs: IPCChainTester_deploy_contract_args) -> Bool {
+  return
+    (lhs.id == rhs.id) &&
+    (lhs.account == rhs.account) &&
+    (lhs.wasm == rhs.wasm) &&
+    (lhs.abi == rhs.abi)
+}
+
+extension IPCChainTester_deploy_contract_args : Hashable {
+
+  fileprivate func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+    hasher.combine(account)
+    hasher.combine(wasm)
+    hasher.combine(abi)
+  }
+
+}
+
+extension IPCChainTester_deploy_contract_args : TStruct {
+
+  fileprivate static var fieldIds: [String: Int32] {
+    return ["id": 1, "account": 2, "wasm": 3, "abi": 4, ]
+  }
+
+  fileprivate static var structName: String { return "IPCChainTester_deploy_contract_args" }
+
+  fileprivate static func read(from proto: TProtocol) throws -> IPCChainTester_deploy_contract_args {
+    _ = try proto.readStructBegin()
+    var id: Int32!
+    var account: String!
+    var wasm: String!
+    var abi: String!
+
+    fields: while true {
+
+      let (_, fieldType, fieldID) = try proto.readFieldBegin()
+
+      switch (fieldID, fieldType) {
+        case (_, .stop):            break fields
+        case (1, .i32):             id = try Int32.read(from: proto)
+        case (2, .string):           account = try String.read(from: proto)
+        case (3, .string):           wasm = try String.read(from: proto)
+        case (4, .string):           abi = try String.read(from: proto)
+        case let (_, unknownType):  try proto.skip(type: unknownType)
+      }
+
+      try proto.readFieldEnd()
+    }
+
+    try proto.readStructEnd()
+    // Required fields
+    try proto.validateValue(id, named: "id")
+    try proto.validateValue(account, named: "account")
+    try proto.validateValue(wasm, named: "wasm")
+    try proto.validateValue(abi, named: "abi")
+
+    return IPCChainTester_deploy_contract_args(id: id, account: account, wasm: wasm, abi: abi)
+  }
+
+}
+
+
+
+fileprivate final class IPCChainTester_deploy_contract_result {
+
+  fileprivate var success: Data?
+
+
+  fileprivate init() { }
+  fileprivate init(success: Data?) {
+    self.success = success
+  }
+
+}
+
+fileprivate func ==(lhs: IPCChainTester_deploy_contract_result, rhs: IPCChainTester_deploy_contract_result) -> Bool {
+  return
+    (lhs.success == rhs.success)
+}
+
+extension IPCChainTester_deploy_contract_result : Hashable {
+
+  fileprivate func hash(into hasher: inout Hasher) {
+    hasher.combine(success)
+  }
+
+}
+
+extension IPCChainTester_deploy_contract_result : TStruct {
+
+  fileprivate static var fieldIds: [String: Int32] {
+    return ["success": 0, ]
+  }
+
+  fileprivate static var structName: String { return "IPCChainTester_deploy_contract_result" }
+
+  fileprivate static func read(from proto: TProtocol) throws -> IPCChainTester_deploy_contract_result {
+    _ = try proto.readStructBegin()
+    var success: Data?
+
+    fields: while true {
+
+      let (_, fieldType, fieldID) = try proto.readFieldBegin()
+
+      switch (fieldID, fieldType) {
+        case (_, .stop):            break fields
+        case (0, .string):           success = try Data.read(from: proto)
+        case let (_, unknownType):  try proto.skip(type: unknownType)
+      }
+
+      try proto.readFieldEnd()
+    }
+
+    try proto.readStructEnd()
+
+    return IPCChainTester_deploy_contract_result(success: success)
+  }
+
+}
+
+
+
 fileprivate final class IPCChainTester_get_table_rows_args {
 
   fileprivate var id: Int32
@@ -3527,6 +3670,30 @@ extension IPCChainTesterClient : IPCChainTester {
     return try recv_push_actions()
   }
 
+  private func send_deploy_contract(id: Int32, account: String, wasm: String, abi: String) throws {
+    try outProtocol.writeMessageBegin(name: "deploy_contract", type: .call, sequenceID: 0)
+    let args = IPCChainTester_deploy_contract_args(id: id, account: account, wasm: wasm, abi: abi)
+    try args.write(to: outProtocol)
+    try outProtocol.writeMessageEnd()
+  }
+
+  private func recv_deploy_contract() throws -> Data {
+    try inProtocol.readResultMessageBegin() 
+    let result = try IPCChainTester_deploy_contract_result.read(from: inProtocol)
+    try inProtocol.readMessageEnd()
+
+    if let success = result.success {
+      return success
+    }
+    throw TApplicationError(error: .missingResult(methodName: "deploy_contract"))
+  }
+
+  public func deploy_contract(id: Int32, account: String, wasm: String, abi: String) throws -> Data {
+    try send_deploy_contract(id: id, account: account, wasm: wasm, abi: abi)
+    try outProtocol.transport.flush()
+    return try recv_deploy_contract()
+  }
+
   private func send_get_table_rows(id: Int32, json: Bool, code: String, scope: String, table: String, lower_bound: String, upper_bound: String, limit: Int64, key_type: String, index_position: String, reverse: Bool, show_payer: Bool) throws {
     try outProtocol.writeMessageBegin(name: "get_table_rows", type: .call, sequenceID: 0)
     let args = IPCChainTester_get_table_rows_args(id: id, json: json, code: code, scope: scope, table: table, lower_bound: lower_bound, upper_bound: upper_bound, limit: limit, key_type: key_type, index_position: index_position, reverse: reverse, show_payer: show_payer)
@@ -3841,6 +4008,23 @@ extension IPCChainTesterProcessor : TProcessor {
       catch let error { throw error }
 
       try outProtocol.writeMessageBegin(name: "push_actions", type: .reply, sequenceID: sequenceID)
+      try result.write(to: outProtocol)
+      try outProtocol.writeMessageEnd()
+      try outProtocol.transport.flush()
+    }
+    processorHandlers["deploy_contract"] = { sequenceID, inProtocol, outProtocol, handler in
+
+      let args = try IPCChainTester_deploy_contract_args.read(from: inProtocol)
+
+      try inProtocol.readMessageEnd()
+
+      var result = IPCChainTester_deploy_contract_result()
+      do {
+        result.success = try handler.deploy_contract(id: args.id, account: args.account, wasm: args.wasm, abi: args.abi)
+      }
+      catch let error { throw error }
+
+      try outProtocol.writeMessageBegin(name: "deploy_contract", type: .reply, sequenceID: sequenceID)
       try result.write(to: outProtocol)
       try outProtocol.writeMessageEnd()
       try outProtocol.transport.flush()
@@ -4442,7 +4626,6 @@ extension ApplyRequestProcessor : TProcessor {
       try outProtocol.writeException(messageName: messageName, sequenceID: sequenceID, ex: ex)
       try outProtocol.transport.flush()
     }
-      
       if messageName == "apply_end" {
           throw TApplicationError( thriftErrorCode: 0, message: "apply_end")
       }
