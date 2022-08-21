@@ -62,9 +62,6 @@ class ApplyRequestService: ApplyRequest {
 
     func apply_request(receiver: Uint64, firstReceiver: Uint64, action: Uint64) throws -> Int32 {
         RunApplyFunc(receiver: receiver.rawValue.uint64, firstReceiver: firstReceiver.rawValue.uint64, action: action.rawValue.uint64)
-        for i in 0...10 {
-            try GetApplyClient().prints(cstr: "hello, world\n")
-        }
         _ = try GetApplyClient().end_apply()
         return 0
     }

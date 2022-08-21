@@ -1,7 +1,21 @@
 import XCTest
 @testable import ChainTester
 
+func Apply(_ receiver: UInt64, _ firstReceiver: UInt64, _ action: UInt64) -> Void {
+    for i in 0...20 {
+        try? GetApplyClient().printi(n: Int64(exactly: i)!)
+        try? GetApplyClient().prints(cstr: "hello, world\n")
+    }
+}
+
+func SetApplyFunc(_ fn: @escaping (Swift.UInt64, Swift.UInt64, Swift.UInt64) -> Void) {
+    gApplyFunc = fn
+}
+
 final class ChainTesterTests: XCTestCase {
+    override class func setUp() {
+        SetApplyFunc(Apply)
+    }
 
     func testBasic() throws {
         let tester = try ChainTester()
