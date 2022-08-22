@@ -99,6 +99,28 @@ public func getFile(_ path: String, _ hex: Bool = false) -> String? {
     }
 }
 
+var gChainClient: IPCChainTesterClient? = nil
+
+func GetChainTesterClient() -> IPCChainTesterClient {
+    if gChainClient == nil {
+        let transport = try? Thrift.TSocketTransport(hostname: "localhost", port: 9090)
+        let proto = Thrift.TBinaryProtocol(on: transport!)
+        gChainClient = IPCChainTesterClient(inoutProtocol: proto)
+    }
+    return gChainClient!;
+}
+
+var applyRequestServer: SocketServer<Thrift.TBinaryProtocol, Thrift.TBinaryProtocol, ApplyRequestProcessor>? = nil
+
+func GetApplyRequestServer() -> SocketServer<Thrift.TBinaryProtocol, Thrift.TBinaryProtocol, ApplyRequestProcessor> {
+    if applyRequestServer == nil {
+        let service: ApplyRequest = ApplyRequestService()
+        let processor: ApplyRequestProcessor = ApplyRequestProcessor(service: service)
+        applyRequestServer = try? SocketServer(port: 9091, inProtocol: Thrift.TBinaryProtocol.self, outProtocol: TBinaryProtocol.self, processor: processor)
+    }
+    return applyRequestServer!;
+}
+
 public class ChainTester {
     public let client: IPCChainTesterClient
     public var id: Int32
@@ -106,19 +128,15 @@ public class ChainTester {
 
     required public init() throws {
         id = 0
-        let transport = try Thrift.TSocketTransport(hostname: "localhost", port: 9090)
-        let proto = Thrift.TBinaryProtocol(on: transport)
-        client = IPCChainTesterClient(inoutProtocol: proto)
+        client = GetChainTesterClient()
 
-        let service: ApplyRequest = ApplyRequestService()
-        let processor: ApplyRequestProcessor = ApplyRequestProcessor(service: service)
-        applyRequestServer =
-        try SocketServer(port: 9091, inProtocol: Thrift.TBinaryProtocol.self, outProtocol: TBinaryProtocol.self, processor: processor)
+        applyRequestServer = GetApplyRequestServer()
         
         try client.init_vm_api()
         try InitApplyClient()
         try client.init_apply_request()
         self.waitForApplyRequestClient()
+
         assert(applyRequestServer.clientFileHandle != nil, "bad clientFileHandle")
         id = try client.new_chain()
     }
