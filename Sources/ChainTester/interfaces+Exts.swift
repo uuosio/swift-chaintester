@@ -1488,17 +1488,24 @@ extension IPCChainTester_unpack_action_args_result : TStruct {
 
 fileprivate final class IPCChainTester_new_chain_args {
 
+  fileprivate var initialize: Bool
 
-  fileprivate init() { }
+
+  fileprivate init(initialize: Bool) {
+    self.initialize = initialize
+  }
+
 }
 
 fileprivate func ==(lhs: IPCChainTester_new_chain_args, rhs: IPCChainTester_new_chain_args) -> Bool {
-  return true
+  return
+    (lhs.initialize == rhs.initialize)
 }
 
 extension IPCChainTester_new_chain_args : Hashable {
 
   fileprivate func hash(into hasher: inout Hasher) {
+    hasher.combine(initialize)
   }
 
 }
@@ -1506,13 +1513,14 @@ extension IPCChainTester_new_chain_args : Hashable {
 extension IPCChainTester_new_chain_args : TStruct {
 
   fileprivate static var fieldIds: [String: Int32] {
-    return [:]
+    return ["initialize": 1, ]
   }
 
   fileprivate static var structName: String { return "IPCChainTester_new_chain_args" }
 
   fileprivate static func read(from proto: TProtocol) throws -> IPCChainTester_new_chain_args {
     _ = try proto.readStructBegin()
+    var initialize: Bool!
 
     fields: while true {
 
@@ -1520,6 +1528,7 @@ extension IPCChainTester_new_chain_args : TStruct {
 
       switch (fieldID, fieldType) {
         case (_, .stop):            break fields
+        case (1, .bool):            initialize = try Bool.read(from: proto)
         case let (_, unknownType):  try proto.skip(type: unknownType)
       }
 
@@ -1527,8 +1536,10 @@ extension IPCChainTester_new_chain_args : TStruct {
     }
 
     try proto.readStructEnd()
+    // Required fields
+    try proto.validateValue(initialize, named: "initialize")
 
-    return IPCChainTester_new_chain_args()
+    return IPCChainTester_new_chain_args(initialize: initialize)
   }
 
 }
@@ -3410,9 +3421,9 @@ extension IPCChainTesterClient : IPCChainTester {
     return try recv_unpack_action_args()
   }
 
-  private func send_new_chain() throws {
+  private func send_new_chain(initialize: Bool) throws {
     try outProtocol.writeMessageBegin(name: "new_chain", type: .call, sequenceID: 0)
-    let args = IPCChainTester_new_chain_args()
+    let args = IPCChainTester_new_chain_args(initialize: initialize)
     try args.write(to: outProtocol)
     try outProtocol.writeMessageEnd()
   }
@@ -3428,8 +3439,8 @@ extension IPCChainTesterClient : IPCChainTester {
     throw TApplicationError(error: .missingResult(methodName: "new_chain"))
   }
 
-  public func new_chain() throws -> Int32 {
-    try send_new_chain()
+  public func new_chain(initialize: Bool) throws -> Int32 {
+    try send_new_chain(initialize: initialize)
     try outProtocol.transport.flush()
     return try recv_new_chain()
   }
@@ -3833,7 +3844,7 @@ extension IPCChainTesterProcessor : TProcessor {
 
       var result = IPCChainTester_new_chain_result()
       do {
-        result.success = try handler.new_chain()
+        result.success = try handler.new_chain(initialize: args.initialize)
       }
       catch let error { throw error }
 

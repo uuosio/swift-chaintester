@@ -221,9 +221,11 @@ public protocol IPCChainTester {
   func unpack_action_args(id: Int32, contract: String, action: String, raw_args: Data) throws -> Data
 
   ///
+  /// - Parameters:
+  ///   - initialize: 
   /// - Returns: Int32
   /// - Throws: 
-  func new_chain() throws -> Int32
+  func new_chain(initialize: Bool) throws -> Int32
 
   ///
   /// - Parameters:

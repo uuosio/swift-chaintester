@@ -2,7 +2,7 @@ import XCTest
 @testable import ChainTester
 
 func Apply(_ receiver: UInt64, _ firstReceiver: UInt64, _ action: UInt64) -> Void {
-    for i in 0...20 {
+    for i in 0...5 {
         try? GetApplyClient().printi(n: Int64(exactly: i)!)
         try? GetApplyClient().prints(cstr: "hello, world\n")
     }
@@ -22,7 +22,7 @@ final class ChainTesterTests: XCTestCase {
         try tester.enableDebugContract("helloworld33", true)
 
         let key = try tester.createKey()
-        print(key)
+        debugPrint(key)
 
         let ret = try tester.importKey(key["public"]!, key["private"]!)
         assert(ret, "import key")
@@ -31,7 +31,7 @@ final class ChainTesterTests: XCTestCase {
         try tester.createAccount("hello", "helloworld33", pubKey, pubKey)
         try tester.produceBlock()
         let accountInfo = try tester.getAccount("helloworld33")
-        print(accountInfo)
+        debugPrint(accountInfo)
 
         let permissions = """
         {
@@ -39,7 +39,7 @@ final class ChainTesterTests: XCTestCase {
         }
         """
 
-        print(try tester.getInfo())
+        debugPrint(try tester.getInfo())
 
         _ = try tester.deployContract("helloworld33",
             "/Users/newworld/dev/as/ascdk/ts-packages/chaintester/tests/hello.wasm",
@@ -49,9 +49,9 @@ final class ChainTesterTests: XCTestCase {
         let ret2 = try tester.pushAction("helloworld33", "sayhello", "{}", permissions)
 
 
-        print(ret2)
+        debugPrint(ret2)
 
-        print("done!")
+        debugPrint("done!")
         // XCTAssertEqual(ChainTester().text, "Hello, World!")
     }
 }

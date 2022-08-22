@@ -126,7 +126,7 @@ public class ChainTester {
     public var id: Int32
     public let applyRequestServer: SocketServer<Thrift.TBinaryProtocol, Thrift.TBinaryProtocol, ApplyRequestProcessor>
 
-    required public init() throws {
+    required public init(_ initialize: Bool=true) throws {
         id = 0
         client = GetChainTesterClient()
 
@@ -138,7 +138,7 @@ public class ChainTester {
         self.waitForApplyRequestClient()
 
         assert(applyRequestServer.clientFileHandle != nil, "bad clientFileHandle")
-        id = try client.new_chain()
+        id = try client.new_chain(initialize: initialize)
     }
 
     public func waitForApplyRequestClient() {
